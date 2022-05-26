@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const  jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -14,7 +14,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.rka2j.mongodb.net/?retryWrites=true&w=majority`;
 
-console.log(uri);
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -29,6 +28,13 @@ try{
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
+  });
+  app.get("/service-single/:id", async (req, res) => {
+    const {id} = req.params;
+    console.log(id);
+    const query = { _id: ObjectId(id) };
+    const result = await serviceCollection.findOne(query);
+    res.send(result);
   });
 
   app.get('/user', async (req, res) => {
